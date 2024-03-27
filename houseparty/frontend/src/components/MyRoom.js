@@ -48,18 +48,18 @@ const MyRoom = ({ leaveRoomCallBack }) => {
 
           <Grid item xs={12} align="center">
             <CreateRoom 
-              update={true} 
-              votes_to_skip={roominfo.votes_to_skip}
-              guestCanPause={roominfo.guest_can_pause}
-              roomCode={roominfo.roomCode}
-              // updateCallBack={}
+              isUpdate={true} 
+              currentVotesToSkip={roominfo.votes_to_skip}
+              currentGuestCanPause={roominfo.guest_can_pause}
+              currentRoomCode={roomCode}
+              updateCallBack={() => {}}
               />
           </Grid>
 
           <Grid item xs={12} align="center">
-          <Button variant="contained" color="secondary" onClick={()=>setShowSetting(true)}>
-            Settings
-          </Button>
+            <Button variant="contained" color="secondary" onClick={()=>setShowSetting(false)}>
+              Close
+            </Button>
           </Grid>
       
         </Grid>
@@ -68,13 +68,13 @@ const MyRoom = ({ leaveRoomCallBack }) => {
 
         <Grid item xs={12} align="center">
           <Typography variant="h4" component="h4">
-              Code: {roomCode}
+            Code: {roomCode}
           </Typography>
         </Grid>
 
         <Grid item xs={12} align="center">
           <Typography variant="h6" component="h6">
-              Votes to Skip: {roominfo.votes_to_skip}
+            Votes to Skip: {roominfo.votes_to_skip}
           </Typography>
         </Grid>
 
@@ -92,15 +92,15 @@ const MyRoom = ({ leaveRoomCallBack }) => {
 
         { roominfo.is_host && (
           <Grid item xs={12} align="center">
-            <Button variant="contained" color="primary" onClick={()=>setShowSetting(false)}>
-              Settings
+            <Button variant="contained" color="primary" onClick={()=>setShowSetting(true)}>
+            Settings
             </Button>
           </Grid>
         ) }
 
         <Grid item xs={12} align="center">
           <Button variant="contained" color="secondary" onClick = { handleLeaveButtonPressed }>
-              Leave Room
+            Leave Room
           </Button>
         </Grid>
 

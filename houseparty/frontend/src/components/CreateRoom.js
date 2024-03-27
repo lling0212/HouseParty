@@ -9,13 +9,19 @@ import { Link, useNavigate } from "react-router-dom";
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import { Collapse } from "@mui/material";
 
 
-export default function CreateRoom() {
+export default function CreateRoom(
+    { isUpdate, currentVotesToSkip, currentGuestCanPause, currentRoomCode, updateCallBack }
+    ) {
     const defaultVotes = 2;
     const navigate = useNavigate();
-    const [guestCanPause, setGuestCanPause] = useState(true);
-    const [votesToSkip, setVotesToSkip] = useState(defaultVotes);
+    const [title, setTitle] = useState(() => isUpdate ? `Update Room: ${currentRoomCode}` : "Create A Room");
+    const [guestCanPause, setGuestCanPause] = useState(() => isUpdate? currentGuestCanPause : true);
+    const [votesToSkip, setVotesToSkip] = useState(() => isUpdate? currentVotesToSkip : defaultVotes);
+    const [successMsg, setSuccessMsg] = useState("");
+    const [errMsg, setErrMsg] = useState("");
 
     function handleVotesChange(e) {
         setVotesToSkip(e.target.value);
@@ -38,35 +44,63 @@ export default function CreateRoom() {
         fetch("/api/create-room", requestOptions)
             .then((response) => response.json())
             .then((data => {
-                console.log(data)
-                navigate('/room/' +  data.code)
+                console.log(data);
+                navigate('/room/' +  data.code);
             })
         );
+    }
+
+    function handleUpdateButtonPressed() {
+        const requestOptions = {
+            method: "PATCH",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                votes_to_skip: votesToSkip,
+                guest_can_pause: guestCanPause,
+                code: currentRoomCode
+            }),
+        };
+        fetch("/api/update-room", requestOptions)
+            .then((response) => {
+            if (response.ok) {
+                setSuccessMsg("Room updated successfully!");
+            } else {
+                setErrMsg("Error updating room...");
+            }
+        });
     }
 
     return (
     <Grid container spacing={1}>
         <Grid item xs={12} align="center">
+            <Collapse in={errMsg != "" || successMsg != ""}>
+                {successMsg != "" ? successMsg : errMsg}
+            </Collapse>
+        </Grid>
+
+        <Grid item xs={12} align="center">
             <Typography component='h4' variant='h4'>
-                Create A Room
+                { title } 
             </Typography>
         </Grid>
+
         <Grid item xs={12} align="center">
             <FormControl component="fieldset">
                 <FormHelperText align='center'>
                     Guest Control of Playback State
                 </FormHelperText>
 
-                <RadioGroup row defaultValue="true"
+                <RadioGroup row 
+                defaultValue="true"
                 onChange={handleGuestCanPauseChange}>
                     <FormControlLabel 
-                        value="true" 
+                        value={isUpdate ? (currentGuestCanPause ? "true" : "false") : "true" }
                         control={<Radio color="primary"/>}
                         label="Play/Pause"
                         labelPlacement="bottom"
                         />
                     <FormControlLabel 
-                        value="false" 
+                        value={isUpdate ? (currentGuestCanPause ? "false" : "true") : "false" }
                         control={<Radio color="secondary"/>}
                         label="No Control"
                         labelPlacement="bottom"
@@ -80,7 +114,7 @@ export default function CreateRoom() {
                     required={true}
                     type="number"
                     onChange={handleVotesChange}
-                    defaultValue={defaultVotes}
+                    defaultValue={isUpdate ? currentVotesToSkip : defaultVotes}
                     inputProps={{
                         min: 1,
                         style: {textAlign: "center" },
@@ -92,19 +126,30 @@ export default function CreateRoom() {
             </Grid>
             
         </Grid>
-
-        <Grid item xs={12} align="center">
-            <Button color='primary' variant='contained'
-                onClick={handleRoomButtonPressed}>
-                Create A Room
-            </Button>
-        </Grid>
-
-        <Grid item xs={12} align="center">
-            <Button color='secondary' variant='contained' to="/" component={Link}>
-                Back
-            </Button>
-        </Grid>
+        
+        { isUpdate ? (
+            <Grid item xs={12} align="center">
+                <Button color='primary' variant='contained'
+                    onClick={handleUpdateButtonPressed}>
+                    Update
+                </Button>
+            </Grid>
+        ) : (
+            <Grid item xs={12} align="center">
+                <Button color='primary' variant='contained'
+                    onClick={handleRoomButtonPressed}>
+                    Create A Room
+                </Button>
+            </Grid>
+        ) }
+        
+        { !isUpdate && (
+            <Grid item xs={12} align="center">
+                <Button color='secondary' variant='contained' to="/" component={Link}>
+                    Back
+                </Button>
+            </Grid>
+        )}
 
     </Grid>
     )
