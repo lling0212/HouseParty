@@ -10,6 +10,8 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { Collapse } from "@mui/material";
+import Alert from '@mui/material/Alert';
+import CheckIcon from '@mui/icons-material';
 
 
 export default function CreateRoom(
@@ -20,8 +22,8 @@ export default function CreateRoom(
     const [title, setTitle] = useState(() => isUpdate ? `Update Room: ${currentRoomCode}` : "Create A Room");
     const [guestCanPause, setGuestCanPause] = useState(() => isUpdate? currentGuestCanPause : true);
     const [votesToSkip, setVotesToSkip] = useState(() => isUpdate? currentVotesToSkip : defaultVotes);
-    const [successMsg, setSuccessMsg] = useState("");
-    const [errMsg, setErrMsg] = useState("");
+    const [msg, setMsg] = useState("");
+    const [success, setSuccess] = useState(true);
 
     function handleVotesChange(e) {
         setVotesToSkip(e.target.value);
@@ -32,7 +34,6 @@ export default function CreateRoom(
     }
 
     function handleRoomButtonPressed() {
-        // console.log(this.state);
         const requestOptions = {
             method: "POST",
             headers: {"Content-Type": "application/json"},
@@ -63,18 +64,30 @@ export default function CreateRoom(
         fetch("/api/update-room", requestOptions)
             .then((response) => {
             if (response.ok) {
-                setSuccessMsg("Room updated successfully!");
+                setMsg("Room updated successfully!");
             } else {
-                setErrMsg("Error updating room...");
+                setSuccess(false);
+                setMsg("Error updating room...");
             }
+            updateCallBack(currentRoomCode);
         });
     }
 
     return (
     <Grid container spacing={1}>
         <Grid item xs={12} align="center">
-            <Collapse in={errMsg != "" || successMsg != ""}>
-                {successMsg != "" ? successMsg : errMsg}
+            <Collapse in={msg != ""}>
+                {success ? (
+                    <Alert severity="success"
+                        onClose={() => {setMsg("");}}>
+                        {msg}
+                    </Alert>
+                ) : (
+                    <Alert severity="error"
+                        onClose={() => {setMsg("");}}>
+                        {msg}
+                    </Alert>
+                )};
             </Collapse>
         </Grid>
 

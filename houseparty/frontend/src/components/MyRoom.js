@@ -22,9 +22,9 @@ const MyRoom = ({ leaveRoomCallBack }) => {
         navigate('/');
       })
   }
-  
-  useEffect(() => {
-    fetch('/api/get-room' + '?code=' + roomCode)
+
+  function getRoomDetails(myRoomCode) {
+    fetch('/api/get-room' + '?code=' + myRoomCode)
         .then((response) => {
           if (!response.ok){
             leaveRoomCallBack();
@@ -36,6 +36,10 @@ const MyRoom = ({ leaveRoomCallBack }) => {
         .then((data) => {
               setRoomInfo(data);
           });
+  }
+  
+  useEffect(() => {
+    getRoomDetails(roomCode);
   }, []);
   
 
@@ -52,7 +56,7 @@ const MyRoom = ({ leaveRoomCallBack }) => {
               currentVotesToSkip={roominfo.votes_to_skip}
               currentGuestCanPause={roominfo.guest_can_pause}
               currentRoomCode={roomCode}
-              updateCallBack={() => {}}
+              updateCallBack={getRoomDetails}
               />
           </Grid>
 
