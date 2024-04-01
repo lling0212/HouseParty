@@ -11,7 +11,6 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { Collapse } from "@mui/material";
 import Alert from '@mui/material/Alert';
-import CheckIcon from '@mui/icons-material';
 
 
 export default function CreateRoom(
@@ -45,7 +44,6 @@ export default function CreateRoom(
         fetch("/api/create-room", requestOptions)
             .then((response) => response.json())
             .then((data => {
-                console.log(data);
                 navigate('/room/' +  data.code);
             })
         );

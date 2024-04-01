@@ -2,12 +2,16 @@ import { Grid, Typography, Button } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from 'react-router-dom';
 import CreateRoom from './CreateRoom.js';
+import MusicPlayer from "./MusicPlayer.js";
 
 
 const MyRoom = ({ leaveRoomCallBack }) => {
   
   const[roominfo, setRoomInfo] = useState({});
   const[showSetting, setShowSetting] = useState(false);
+  const[spotifyAuth, setSpotifyAuth] = useState(false);
+  const[song, setSong] = useState({});
+
   const navigate = useNavigate();
 
   function handleLeaveButtonPressed() {
@@ -17,9 +21,27 @@ const MyRoom = ({ leaveRoomCallBack }) => {
     };
     fetch('/api/leave-room', requestOptions)
       .then((response) => {
-        console.log("leaving");
         leaveRoomCallBack();
         navigate('/');
+      })
+  }
+
+  function authenticateSpotify() {
+    fetch('/spotify/is-authenticated')
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        setSpotifyAuth(data.status);
+        if (!data.status) {
+          console.log("Need authorization")
+          fetch('/spotify/get-auth-url')
+            .then((response) => response.json())
+            .then((data) => {
+              // console.log(data);
+              window.location.replace(data.url);
+            })
+        }
       })
   }
 
@@ -30,16 +52,36 @@ const MyRoom = ({ leaveRoomCallBack }) => {
             leaveRoomCallBack();
             navigate('/');
           } else {
-            return response.json()
+            return response.json();
           }
         })
         .then((data) => {
-              setRoomInfo(data);
-          });
+          setRoomInfo(data);
+          if (data.is_host) {
+            authenticateSpotify();
+          }
+        });
   }
-  
+
   useEffect(() => {
     getRoomDetails(roomCode);
+
+    function getCurrentSong() {
+      fetch('/spotify/current-song')
+        .then((response) => {
+          if (!response.ok) {
+            return {};
+          } else {
+            return response.json();
+          }
+        })
+        .then((data) => {
+          console.log(data);
+          setSong(data)})
+    }
+
+    const interval = setInterval(getCurrentSong, 1500);
+    return () => clearInterval(interval);
   }, []);
   
 
@@ -75,6 +117,8 @@ const MyRoom = ({ leaveRoomCallBack }) => {
             Code: {roomCode}
           </Typography>
         </Grid>
+
+        <MusicPlayer currentSong={song}/>
 
         <Grid item xs={12} align="center">
           <Typography variant="h6" component="h6">

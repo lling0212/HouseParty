@@ -39,7 +39,6 @@ function HomePage() {
 
     function clearRoomCode() {
         setRoomCode(null);
-        console.log("clearing room code")
     }
 
     useEffect(()=> {
