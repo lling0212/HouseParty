@@ -118,7 +118,9 @@ const MyRoom = ({ leaveRoomCallBack }) => {
           </Typography>
         </Grid>
 
-        <MusicPlayer currentSong={song}/>
+        <Grid item xs={12} align="center">
+          <MusicPlayer currentSong={song}/>
+        </Grid>
 
         <Grid item xs={12} align="center">
           <Typography variant="h6" component="h6">
