@@ -13,11 +13,25 @@ export default function Info() {
     const [page, setPage] = useState(pages.CREATE);
     
     function joinInfo() {
-        return "Join";
+        return (
+            <>
+                <br/>
+                Enter room code to join a room
+                <br/>
+            </>
+        )
     }
 
     function createInfo() {
-        return "Create";
+        return (
+            <>
+                <br/>
+                If you are the host, create a new room and share the room code with your guests<br/> 
+                Once logged into Spotify, your currently playing song will be displayed<br/> 
+                Click the settings inside a room to change your original room settings
+                <br/>
+            </>
+        )
     }
 
     return (

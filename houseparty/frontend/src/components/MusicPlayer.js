@@ -1,5 +1,5 @@
 import { React, useState, useEffect } from "react";
-import { Box, Typography, Card, IconButton, LinearProgress } from "@mui/material";
+import { Box, Typography, Card, IconButton, LinearProgress, CardContent, CardMedia } from "@mui/material";
 import { PlayArrow, SkipNext, Pause } from "@mui/icons-material";
 
 
@@ -32,25 +32,20 @@ function MusicPlayer({ currentSong }) {
     }
 
     return (
-        <Card>
-            <Grid container alignItems="center">
-                <Grid item align="center" xs={4}>
-                {JSON.stringify(currentSong) === '{}' ?
-                    <img src="../static/default.jpg" height="70%" width="70%"/>
-                    : <img src={currentSong.image_url} height="70%" width="70%"/>
-                }   
-                </Grid>
+        <Card sx={{ display: 'flex' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
 
-                <Grid item align="center" xs={8}>
+                <CardContent sx={{ flex: '1 0 auto' }}>
                     <Typography component="h5" variant="h5">
-                        {JSON.stringify(currentSong) === '{}' ? "No song playing" : currentSong.title}
+                        {JSON.stringify(currentSong) === '{}' ? "There is no song currently playing..." : currentSong.title}
                     </Typography>
                     <Typography color="textSecondary" variant="subtitle1">
                         {JSON.stringify(currentSong) === '{}' ? "" : currentSong.artist}
                     </Typography>
-
-                    { JSON.stringify(currentSong) !== '{}' &&
-                    <div>
+                </CardContent>
+                    
+                { JSON.stringify(currentSong) !== '{}' &&
+                    <Box sx={{ display: 'flex', alignItems: 'center', pl: 1, pb: 1 }}>
                         <IconButton onClick={()=>{
                             currentSong.is_playing ? pauseSong() : playSong()
                         }}>
@@ -60,13 +55,17 @@ function MusicPlayer({ currentSong }) {
                         <IconButton onClick={()=>{ skipSong() }}>
                             {`${currentSong.votes} / ${currentSong.votes_required}`} <SkipNext />
                         </IconButton>
-                    </div>
+                    </Box>
                 }
-
-                </Grid>
-            </Grid>
-            
-            <LinearProgress variant="determinate" value={ songProgress }/>
+                <LinearProgress variant="determinate" value={ songProgress }/>
+            </Box>
+            <CardMedia
+                component="img"
+                sx={{ width: 200 }}
+                image={JSON.stringify(currentSong) === '{}' ?
+                    "../static/default.jpg"
+                    : currentSong.image_url
+            }/>
 
         </Card>
     );
